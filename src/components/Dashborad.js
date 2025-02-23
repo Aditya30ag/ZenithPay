@@ -5,6 +5,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [savingAmount, setSavingAmount] = useState("");
+  const [accountNumber, setaccountNumber] = useState("");
 
   useEffect(() => {
     fetchUserData();
@@ -14,7 +15,7 @@ export default function Dashboard() {
     try {
       setIsLoading(true);
       const id = localStorage.getItem("id");
-      
+
       if (!id) {
         throw new Error("User ID not found in localStorage");
       }
@@ -28,6 +29,7 @@ export default function Dashboard() {
 
       const data = await response.json();
       console.log("User data fetched successfully:", data);
+      setaccountNumber(data.accountNumber);
       setUserData(data);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -110,7 +112,11 @@ export default function Dashboard() {
       </div>
     );
   }
-
+  const recentTransactions = userData.transactions
+    ? [...userData.transactions]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5)
+    : [];
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Welcome, {userData.fullName}</h1>
@@ -119,14 +125,22 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
           <div className="text-slate-400">Current Balance</div>
-          <div className="text-2xl font-bold mt-2">₹{userData.balance.toLocaleString()}</div>
-          <div className="text-sm text-slate-400 mt-1">Account: {userData.accountNumber}</div>
+          <div className="text-2xl font-bold mt-2">
+            ₹{userData.balance.toLocaleString()}
+          </div>
+          <div className="text-sm text-slate-400 mt-1">
+            Account: {userData.accountNumber}
+          </div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
           <div className="text-slate-400">Savings Amount</div>
-          <div className="text-2xl font-bold mt-2">₹{userData.savingAmount.toLocaleString()}</div>
+          <div className="text-2xl font-bold mt-2">
+            ₹{userData.savingAmount.toLocaleString()}
+          </div>
         </div>
+
+        
       </div>
 
       {/* Add to Savings Section */}
@@ -154,7 +168,7 @@ export default function Dashboard() {
       {/* Recent Transactions */}
       <h2 className="text-xl font-bold mb-4">Recent Transactions</h2>
       <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-        {userData.transactions && userData.transactions.length > 0 ? (
+        {recentTransactions.length > 0 ? (
           <table className="w-full text-left">
             <thead>
               <tr>
@@ -166,12 +180,22 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {userData.transactions.map((transaction) => (
+              {recentTransactions.map((transaction) => (
                 <tr key={transaction.id} className="border-t border-slate-800">
-                  <td className="py-2">{new Date(transaction.timestamp).toLocaleDateString()}</td>
+                  <td className="py-2">
+                    {new Date(transaction.timestamp).toLocaleString()}
+                  </td>
                   <td className="py-2">{transaction.referenceNumber}</td>
-                  <td className="py-2">₹{transaction.amount.toLocaleString()}</td>
-                  <td className={`py-2 ${transaction.transactionType === 'CREDIT' ? 'text-green-400' : 'text-red-400'}`}>
+                  <td className="py-2">
+                    ₹{transaction.amount.toLocaleString()}
+                  </td>
+                  <td
+                    className={`py-2 ${
+                      transaction.transactionType === "CREDIT"
+                        ? "text-green-400"
+                        : "text-red-400"
+                    }`}
+                  >
                     {transaction.transactionType}
                   </td>
                   <td className="py-2">{transaction.status}</td>

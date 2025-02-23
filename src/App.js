@@ -6,6 +6,7 @@ import BankWelcomePage from './components/Welcome';
 import LoginForm from './components/Login';
 import Otp from './components/Otp';
 import ZenithDashboard from './components/Home';
+import SignupForm from './components/Signupform';
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredAuth, redirectPath }) => {
   // Check if the required token exists in localStorage
@@ -59,6 +60,14 @@ function App() {
       element: (
         <AuthRedirect authType="token" redirectTo="/otp">
           <LoginForm />
+        </AuthRedirect>
+      )
+    },
+    {
+      path: "/signup",
+      element: (
+        <AuthRedirect authType="token" redirectTo="/otp">
+          <SignupForm/>
         </AuthRedirect>
       )
     },
