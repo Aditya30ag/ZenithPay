@@ -9,7 +9,7 @@ export default function BankWelcomePage() {
       <div className="w-full flex flex-col items-center text-center p-10">
         <h1 className="text-5xl font-bold mb-4">Welcome to Zenith Pay</h1>
         <p className="text-gray-400 text-xl mb-8">
-          Your Trusted Financial Partner Since 1995
+          Your Trusted Finance Care Partner 
         </p>
         
         <Link to="/login" className="z-10">
@@ -38,9 +38,9 @@ export default function BankWelcomePage() {
           <h3 className="font-bold text-2xl mb-2">Personal Banking</h3>
           <ul className="text-gray-300 space-y-2">
             <li>✓ Checking & Savings Accounts</li>
-            <li>✓ Mobile Banking App</li>
-            <li>✓ Credit & Debit Cards</li>
-            <li>✓ Personal Loans</li>
+            <li>✓ Web Banking Application</li>
+            <li>✓ Transaction Analytics</li>
+            <li>✓ Balance Visulization</li>
           </ul>
         </div>
         <div className="bg-gray-700 p-6 rounded-lg z-10">

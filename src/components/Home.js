@@ -14,6 +14,7 @@ import AnalyticsDashboard from "./Analytics";
 import Transaction from "./Transactions";
 import Transfers from "./Transfers";
 import Navbar from "./Navbar";
+import FraudDetectionDashboard from "./Frauddetection";
 
 const ZenithDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -55,6 +56,7 @@ const ZenithDashboard = () => {
     { name: "Transfers", icon: Send},
     { name: "Transactions", icon: History},
     { name: "Analytics", icon: PieChart},
+    { name: "Frauddetection", icon: PieChart},
   ];
 
   const renderDashboard = () => {
@@ -71,6 +73,9 @@ const ZenithDashboard = () => {
   };
   const renderTransfers = () => {
     return <Transfers/>
+  };
+  const renderFraudDetection = () => {
+    return <FraudDetectionDashboard/>
   };
 
   const handleonclick = (e) => {
@@ -172,6 +177,7 @@ const ZenithDashboard = () => {
             {activeSection === "Analytics" && renderAnalytics()}
             {activeSection === "Transactions" && renderTransactions()}
             {activeSection === "Transfers" && renderTransfers()}
+            {activeSection === "Frauddetection" && renderFraudDetection()}
           </div>
         </main>
       </div>

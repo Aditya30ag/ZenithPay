@@ -101,11 +101,11 @@ const LoginForm = () => {
         </div>
       <div className="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-lg shadow-xl z-10">
         
-        <divc className="text-center z-10">
+        <div className="text-center z-10">
           <h2 className="text-center text-3xl font-bold text-white z-10">
             Login
           </h2>
-        </divc>
+        </div>
 
         <form className="mt-8 space-y-6 z-10" onSubmit={handleSubmit}>
           <div className="space-y-4">
