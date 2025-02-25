@@ -1,26 +1,44 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { SparklesCore } from "./ui/sparkles";
+import {
+  SignedOut,
+  SignInButton,
+  useAuth
+} from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function BankWelcomePage() {
+  const navigate = useNavigate();
+  const { isSignedIn } = useAuth();
+  
+  // Redirect logic after successful login
+  useEffect(() => {
+    if (isSignedIn) {
+      // Redirect to dashboard or home page after successful login
+      navigate("/login");
+    }
+  }, [isSignedIn, navigate]);
   return (
     <div className="min-h-screen text-white flex flex-col items-center justify-center p-6">
       {/* Hero Section */}
       <div className="w-full flex flex-col items-center text-center p-10">
         <h1 className="text-5xl font-bold mb-4">Welcome to Zenith Pay</h1>
         <p className="text-gray-400 text-xl mb-8">
-          Your Trusted Finance Care Partner 
+          Your Trusted Finance Care Partner
         </p>
-        
-        <Link to="/login" className="z-10">
-  <button className="transition p-4 rounded-lg text-lg font-semibold z-10 animate-bounce">
-    <img 
-      src="/img1.jpg" 
-      alt="Bank" 
-      className="rounded-lg w-32 h-32 object-cover animate-custom-bounce"
-    />
-  </button>
-</Link>
+      
+        <SignedOut>
+        <SignInButton mode="modal">
+          <button className="transition p-4 rounded-lg text-lg font-semibold z-10 animate-bounce">
+            <img
+              src="/img1.jpg"
+              alt="Bank"
+              className="rounded-lg w-32 h-32 object-cover animate-custom-bounce"
+            />
+          </button></SignInButton>
+        </SignedOut>
       </div>
       <div className="w-full absolute inset-0 min-h-screen z-0">
         <SparklesCore

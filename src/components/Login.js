@@ -66,10 +66,10 @@ const LoginForm = () => {
       localStorage.setItem("fullname",data.user.userdetails.full_name);
       localStorage.setItem("id",data.user.id);
       sendOtp(formData.phonenumber);
+      localStorage.setItem("phone",`+91${formData.phonenumber}`);
       if(sendOtp(formData.phonenumber)){
-        localStorage.setItem("phone",`+91${formData.phonenumber}`);
         navigate('/otp');
-        window.location.reload();
+        // window.location.reload();
       }
       
       

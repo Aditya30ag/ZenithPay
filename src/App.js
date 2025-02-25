@@ -7,6 +7,8 @@ import LoginForm from './components/Login';
 import Otp from './components/Otp';
 import ZenithDashboard from './components/Home';
 import SignupForm from './components/Signupform';
+import { ClerkProvider } from "@clerk/clerk-react";
+import Navbar from './components/Navbar';
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredAuth, redirectPath }) => {
   // Check if the required token exists in localStorage
@@ -49,16 +51,19 @@ const AuthRedirect = ({ children, authType, redirectTo }) => {
 function App() {
   document.body.style.backgroundColor = "black";
   document.body.style.color = "white";
+  const clerkFrontendApi = "pk_test_b24taG9nLTUzLmNsZXJrLmFjY291bnRzLmRldiQ";
+  const PUBLISHABLE_KEY = "pk_test_b24taG9nLTUzLmNsZXJrLmFjY291bnRzLmRldiQ";
 
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <BankWelcomePage />
+      element: <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" frontendApi={clerkFrontendApi}><BankWelcomePage /></ClerkProvider>
     },
     {
       path: "/login",
       element: (
         <AuthRedirect authType="token" redirectTo="/otp">
+          <Navbar />
           <LoginForm />
         </AuthRedirect>
       )
@@ -66,42 +71,29 @@ function App() {
     {
       path: "/signup",
       element: (
+        <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" frontendApi={clerkFrontendApi}>
         <AuthRedirect authType="token" redirectTo="/otp">
           <SignupForm/>
-        </AuthRedirect>
+        </AuthRedirect></ClerkProvider>
       )
     },
     {
       path: "/otp",
       element: (
+        <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" frontendApi={clerkFrontendApi}>
         <AuthRedirect authType="otpToken" redirectTo="/home">
           <ProtectedRoute requiredAuth="token" redirectPath="/login">
             <Otp />
           </ProtectedRoute>
-        </AuthRedirect>
+        </AuthRedirect></ClerkProvider>
       )
     },
     {
       path: "/home",
       element: (
+        
         <ProtectedRoute requiredAuth="otpToken" redirectPath="/otp">
           <ZenithDashboard />
-        </ProtectedRoute>
-      )
-    },
-    {
-      path: "/checkbalance",
-      element: (
-        <ProtectedRoute requiredAuth="otpToken" redirectPath="/otp">
-          <div>Check Balance Component</div>
-        </ProtectedRoute>
-      )
-    },
-    {
-      path: "/payment",
-      element: (
-        <ProtectedRoute requiredAuth="otpToken" redirectPath="/otp">
-          <div>Payment Component</div>
         </ProtectedRoute>
       )
     }
