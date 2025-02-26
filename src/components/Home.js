@@ -15,6 +15,7 @@ import Transaction from "./Transactions";
 import Transfers from "./Transfers";
 import Navbar from "./Navbar";
 import FraudDetectionDashboard from "./Frauddetection";
+import AttentionHeatmap from "./HeatMap";
 
 const ZenithDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -104,13 +105,13 @@ const ZenithDashboard = () => {
       <div className="h-full flex flex-col border-r border-slate-800 overflow-hidden rounded-r-2xl">
         {/* Logo */}
         <div className="p-6">
-          <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 text-transparent bg-clip-text">
+          <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 text-transparent bg-clip-text">
             Zenith Pay
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto scrollbar-hide">
+        <nav className="flex-1 px-4 mt-4 space-y-2 overflow-y-auto scrollbar-hide">
           {navigation.map((item) => (
             <button
               onClick={handleonclick}
@@ -123,7 +124,7 @@ const ZenithDashboard = () => {
             </button>
           ))}
         </nav>
-
+        <AttentionHeatmap/>
         {/* Profile Section */}
         <div className="p-4 border-t border-slate-800">
           <div className="relative p-4 bg-slate-900/80 backdrop-blur-sm rounded-xl flex items-center gap-3 shadow-md">
@@ -169,7 +170,7 @@ const ZenithDashboard = () => {
               </div>
             )}
           </div>
-
+            
           {/* Page content */}
           <div className="p-6 space-y-6 relative">
             {activeSection === "Dashboard" && renderDashboard()}
