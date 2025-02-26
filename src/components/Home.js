@@ -16,6 +16,7 @@ import Transfers from "./Transfers";
 import Navbar from "./Navbar";
 import FraudDetectionDashboard from "./Frauddetection";
 import AttentionHeatmap from "./HeatMap";
+import TransactionMap from "./TranctionMap";
 
 const ZenithDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -58,6 +59,7 @@ const ZenithDashboard = () => {
     { name: "Transactions", icon: History},
     { name: "Analytics", icon: PieChart},
     { name: "Frauddetection", icon: PieChart},
+    { name: "TransactionMap", icon: PieChart},
   ];
 
   const renderDashboard = () => {
@@ -77,6 +79,9 @@ const ZenithDashboard = () => {
   };
   const renderFraudDetection = () => {
     return <FraudDetectionDashboard/>
+  };
+  const renderTransactionMap = () => {
+    return <TransactionMap/>
   };
 
   const handleonclick = (e) => {
@@ -179,6 +184,7 @@ const ZenithDashboard = () => {
             {activeSection === "Transactions" && renderTransactions()}
             {activeSection === "Transfers" && renderTransfers()}
             {activeSection === "Frauddetection" && renderFraudDetection()}
+            {activeSection === "TransactionMap" && renderTransactionMap()}
           </div>
         </main>
       </div>
