@@ -197,7 +197,7 @@ const TransactionMap = () => {
               <p style="margin: 4px 0;"><span style="color: #666;">Amount:</span> <span style="color: ${transaction.transactionType === 'CREDIT' ? 'green' : 'red'};">₹${transaction.amount}</span></p>
               <p style="margin: 4px 0;"><span style="color: #666;">Type:</span> ${transaction.transactionType}</p>
               <p style="margin: 4px 0;"><span style="color: #666;">Date:</span> ${date}</p>
-              <p style="margin: 4px 0;"><span style="color: #666;">Location:</span> ${transaction.location.city}, ${transaction.location.country}</p>
+              <p style="margin: 4px 0;"><span style="color: #666;">From Location:</span> ${transaction.location.city}, ${transaction.location.country}</p>
             </div>
           `;
           
