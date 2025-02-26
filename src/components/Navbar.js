@@ -8,6 +8,7 @@ import {
 } from "@clerk/clerk-react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
+import AutoSpeechComponent from './SpeechNotifications';
 
 const Navbar = ({ logout }) => {
   const [hasTokens, setHasTokens] = useState(false);
@@ -41,6 +42,7 @@ const Navbar = ({ logout }) => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+          <AutoSpeechComponent/>
             {/* Notification Bell */}
             <button className="relative p-2 text-slate-400 hover:text-blue-400 transition duration-300">
               <Bell className="w-6 h-6" />

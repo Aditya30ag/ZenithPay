@@ -9,6 +9,7 @@ import ZenithDashboard from './components/Home';
 import SignupForm from './components/Signupform';
 import { ClerkProvider } from "@clerk/clerk-react";
 import Navbar from './components/Navbar';
+
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredAuth, redirectPath }) => {
   // Check if the required token exists in localStorage
