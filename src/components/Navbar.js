@@ -31,7 +31,7 @@ const Navbar = ({ logout }) => {
   const PUBLISHABLE_KEY = "pk_test_b24taG9nLTUzLmNsZXJrLmFjY291bnRzLmRldiQ";
 
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" >
       <div className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-lg border-b border-slate-800 shadow-md">
         <div className="flex items-center justify-between h-16 px-6">
           {/* Brand Title */}

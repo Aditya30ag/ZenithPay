@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
 const AdvancedFraudDetection = () => {
   // State for user data
@@ -21,7 +29,34 @@ const AdvancedFraudDetection = () => {
   });
 
   const maxRetries = 3;
+  // This function safely displays location data whether it's a string or an object
+  const formatLocation = (location) => {
+    if (!location) return "N/A";
 
+    // If location is an object with coordinates and location details
+    if (typeof location === "object") {
+      // Extract the relevant part we want to display
+      if (location.city && location.country) {
+        return `${location.city}, ${location.country}`;
+      } else if (location.country) {
+        return location.country;
+      } else if (location.city) {
+        return location.city;
+      } else {
+        // If we only have coordinates, format them nicely
+        if (location.latitude && location.longitude) {
+          return `Lat: ${location.latitude.toFixed(
+            2
+          )}, Long: ${location.longitude.toFixed(2)}`;
+        }
+        // If it's a different type of object, convert to string
+        return JSON.stringify(location);
+      }
+    }
+
+    // If location is already a string, return it directly
+    return location;
+  };
   // Fetch user data and transactions
   const fetchUserData = async () => {
     try {
@@ -49,7 +84,10 @@ const AdvancedFraudDetection = () => {
       }
 
       if (data.transactions && data.transactions.length > 0) {
-        const processedTransactions = processTransactionsWithRiskAnalysis(data.transactions);
+        const processedTransactions = processTransactionsWithRiskAnalysis(
+          data.transactions,
+          data
+        );
         setTransactions(processedTransactions);
         updateTransactionStats(processedTransactions);
       }
@@ -66,59 +104,351 @@ const AdvancedFraudDetection = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+  const formatIPData = (ipData) => {
+    if (!ipData) return "N/A";
 
+    if (typeof ipData === "object") {
+      // If we have a full IP object with address and other details
+      if (ipData.address) {
+        return ipData.address;
+      }
+      // For other object formats, convert to string representation
+      return JSON.stringify(ipData);
+    }
+
+    // If ipData is already a string, return it directly
+    return ipData;
+  };
   // Process transactions with risk analysis
-  const processTransactionsWithRiskAnalysis = (transactions) => {
+  const processTransactionsWithRiskAnalysis = (transactions, userData) => {
     if (!transactions || transactions.length === 0) return [];
 
-    // Calculate average amount for reference
-    const averageAmount = transactions.reduce((sum, t) => sum + t.amount, 0) / transactions.length;
+    // Calculate baseline metrics
+    const averageAmount =
+      transactions.reduce((sum, t) => sum + t.amount, 0) / transactions.length;
+    const stdDevAmount = Math.sqrt(
+      transactions.reduce(
+        (sum, t) => sum + Math.pow(t.amount - averageAmount, 2),
+        0
+      ) / transactions.length
+    );
+
+    // Get user's regular transaction patterns
+    const transactionsByHour = {};
+    const locationFrequency = {};
+    const deviceFrequency = {};
+    const recipientFrequency = {};
+
+    transactions.forEach((t) => {
+      const hour = new Date(t.timestamp).getHours();
+      transactionsByHour[hour] = (transactionsByHour[hour] || 0) + 1;
+
+      if (t.location) {
+        locationFrequency[t.location] =
+          (locationFrequency[t.location] || 0) + 1;
+      }
+
+      if (t.device) {
+        deviceFrequency[t.device] = (deviceFrequency[t.device] || 0) + 1;
+      }
+
+      if (t.recipientId) {
+        recipientFrequency[t.recipientId] =
+          (recipientFrequency[t.recipientId] || 0) + 1;
+      }
+    });
+
+    // Get most common locations, devices, etc.
+    const mostCommonLocations = Object.entries(locationFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map((entry) => entry[0]);
+
+    const mostCommonDevices = Object.entries(deviceFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map((entry) => entry[0]);
 
     return transactions.map((transaction) => {
       let riskScore = 0;
       const flags = [];
+      const evidence = [];
 
-      // Amount analysis
-      if (transaction.amount > averageAmount * 3) {
-        riskScore += 30;
+      // 1. ENHANCED AMOUNT ANALYSIS
+      // Statistical approach using standard deviation
+      if (transaction.amount > averageAmount + 3 * stdDevAmount) {
+        riskScore += 40;
+        flags.push("statistical_outlier");
+        evidence.push(
+          `Amount (₹${transaction.amount.toFixed(
+            2
+          )}) is more than 3 standard deviations above average (₹${averageAmount.toFixed(
+            2
+          )})`
+        );
+      } else if (transaction.amount > averageAmount + 2 * stdDevAmount) {
+        riskScore += 25;
         flags.push("unusual_amount");
-      } else if (transaction.amount > averageAmount * 1.5) {
-        riskScore += 15;
+        evidence.push(
+          `Amount is significantly higher than typical transactions`
+        );
+      } else if (transaction.amount > averageAmount + stdDevAmount) {
+        riskScore += 10;
         flags.push("high_amount");
+        evidence.push(`Amount is higher than average`);
       }
 
-      // Transaction frequency analysis
+      // Check for round amounts which can be suspicious
+      if (transaction.amount % 1000 === 0 && transaction.amount > 10000) {
+        riskScore += 5;
+        flags.push("round_amount");
+        evidence.push(
+          `Transaction is an exact round amount (₹${transaction.amount})`
+        );
+      }
+
+      // 2. TRANSACTION VELOCITY AND PATTERN ANALYSIS
       const transactionDate = new Date(transaction.timestamp);
+
+      // 2.1 Short-term velocity check (transactions within hours)
       const recentTransactions = transactions.filter((t) => {
         const tDate = new Date(t.timestamp);
-        return Math.abs(transactionDate - tDate) / 36e5 < 2 && t.id !== transaction.id;
+        return (
+          Math.abs(transactionDate - tDate) / 36e5 < 2 &&
+          t.id !== transaction.id
+        );
       });
 
-      if (recentTransactions.length > 3) {
+      if (recentTransactions.length > 5) {
+        riskScore += 35;
+        flags.push("extreme_velocity");
+        evidence.push(
+          `${recentTransactions.length} transactions detected within 2 hours`
+        );
+      } else if (recentTransactions.length > 3) {
         riskScore += 25;
-        flags.push("velocity");
+        flags.push("high_velocity");
+        evidence.push(
+          `${recentTransactions.length} transactions detected within 2 hours`
+        );
       } else if (recentTransactions.length > 1) {
         riskScore += 10;
         flags.push("frequent_activity");
+        evidence.push(`Multiple transactions in short timeframe`);
       }
 
-      // Time pattern analysis
-      const hour = transactionDate.getHours();
-      if (hour < 6 || hour > 23) {
-        riskScore += 10;
-        flags.push("unusual_time");
-      }
+      // 2.2 Similar transaction pattern check (repeated identical amounts)
+      const identicalAmountTxs = recentTransactions.filter(
+        (t) => Math.abs(t.amount - transaction.amount) < 0.01
+      );
 
-      // Failed transaction penalty
-      if (transaction.status === "FAILED") {
+      if (identicalAmountTxs.length > 1) {
         riskScore += 15;
-        flags.push("failed_transaction");
+        flags.push("repeated_amounts");
+        evidence.push(
+          `${identicalAmountTxs.length} recent transactions with identical amounts`
+        );
       }
 
-      riskScore = Math.min(Math.round(riskScore), 100);
-      if (flags.length === 0) flags.push("normal");
+      // 3. TIME PATTERN ANALYSIS
+      const hour = transactionDate.getHours();
+      const dayOfWeek = transactionDate.getDay(); // 0 = Sunday, 6 = Saturday
 
-      return { ...transaction, riskScore, flags };
+      // 3.1 Unusual hour check with user pattern consideration
+      const hourFrequency = transactionsByHour[hour] || 0;
+      const totalTxs = transactions.length;
+
+      if (hour < 6 || hour > 23) {
+        if (hourFrequency / totalTxs < 0.05) {
+          // Less than 5% of transactions at this hour
+          riskScore += 20;
+          flags.push("unusual_hour");
+          evidence.push(
+            `Transaction at ${hour}:00 is outside normal banking hours and unusual for this user`
+          );
+        } else {
+          riskScore += 5;
+          flags.push("non_business_hours");
+          evidence.push(
+            `Transaction outside normal banking hours, but common for this user`
+          );
+        }
+      }
+
+      // 3.2 Weekend check
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        riskScore += 5;
+        flags.push("weekend_transaction");
+        evidence.push(`Transaction on weekend`);
+      }
+
+      // 4. LOCATION AND DEVICE ANALYSIS
+      // 4.1 Uncommon location
+      if (
+        transaction.location &&
+        !mostCommonLocations.includes(transaction.location)
+      ) {
+        riskScore += 15;
+        flags.push("uncommon_location");
+        evidence.push(
+          `Location ${transaction.location} is not among user's common locations`
+        );
+      }
+
+      // 4.2 Uncommon device
+      if (
+        transaction.device &&
+        !mostCommonDevices.includes(transaction.device)
+      ) {
+        riskScore += 15;
+        flags.push("uncommon_device");
+        evidence.push(
+          `Device ${transaction.device} is not among user's common devices`
+        );
+      }
+
+      // 4.3 IP address analysis
+      if (transaction.ipAddress) {
+        let ipAddressValue =
+          typeof transaction.ipAddress === "object"
+            ? transaction.ipAddress.address ||
+              JSON.stringify(transaction.ipAddress)
+            : transaction.ipAddress;
+
+        let ipCountryValue = transaction.ipCountry;
+        if (
+          !ipCountryValue &&
+          typeof transaction.ipAddress === "object" &&
+          transaction.ipAddress.country
+        ) {
+          ipCountryValue = transaction.ipAddress.country;
+        }
+
+        // Now use ipAddressValue and ipCountryValue in the checks
+        if (
+          ipCountryValue &&
+          userData.country &&
+          ipCountryValue !== userData.country
+        ) {
+          riskScore += 30;
+          flags.push("foreign_ip");
+          evidence.push(
+            `IP address from ${ipCountryValue} doesn't match user's country ${userData.country}`
+          );
+        }
+
+        // Check if IP is on known suspicious list (simplified example)
+        const suspiciousIPs = ["192.168.1.100", "10.0.0.1"]; // Example IPs, would be from a database
+        if (suspiciousIPs.includes(ipAddressValue)) {
+          riskScore += 40;
+          flags.push("suspicious_ip");
+          evidence.push(
+            `IP address ${ipAddressValue} has been associated with suspicious activity`
+          );
+        }
+      }
+
+      // 5. TRANSACTION TYPE AND STATUS CHECKS
+      // 5.1 Failed transaction penalty
+      if (transaction.status === "FAILED") {
+        riskScore += 20;
+        flags.push("failed_transaction");
+        evidence.push(`Transaction has failed status`);
+      }
+
+      // 5.2 Pending for unusually long time
+      if (transaction.status === "PENDING") {
+        const currentTime = new Date();
+        const pendingTime = (currentTime - transactionDate) / (1000 * 60 * 60); // hours
+
+        if (pendingTime > 24) {
+          riskScore += 15;
+          flags.push("extended_pending");
+          evidence.push(
+            `Transaction pending for ${Math.round(pendingTime)} hours`
+          );
+        }
+      }
+
+      // 5.3 New recipient check
+      if (
+        transaction.recipientId &&
+        !recipientFrequency[transaction.recipientId]
+      ) {
+        riskScore += 10;
+        flags.push("new_recipient");
+        evidence.push(`First transaction to this recipient`);
+      }
+
+      // 6. ACCOUNT HISTORY CHECKS
+      // 6.1 New account check
+      if (userData.createdAt) {
+        const accountAge =
+          (new Date() - new Date(userData.createdAt)) / (1000 * 60 * 60 * 24); // days
+
+        if (accountAge < 30 && transaction.amount > 5000) {
+          riskScore += 25;
+          flags.push("new_account_large_transaction");
+          evidence.push(
+            `Large transaction (₹${
+              transaction.amount
+            }) on new account (${Math.round(accountAge)} days old)`
+          );
+        }
+      }
+
+      // 6.2 Account balance ratio check
+      if (userData.balance && transaction.amount > userData.balance * 0.7) {
+        riskScore += 20;
+        flags.push("high_balance_ratio");
+        evidence.push(
+          `Transaction amount is ${Math.round(
+            (transaction.amount / userData.balance) * 100
+          )}% of account balance`
+        );
+      }
+
+      // 7. TRANSACTION DESCRIPTION ANALYSIS
+      if (transaction.description) {
+        const suspiciousTerms = [
+          "urgent",
+          "emergency",
+          "help",
+          "investment",
+          "lottery",
+          "winner",
+          "bitcoin",
+          "crypto",
+        ];
+        const containsSuspiciousTerm = suspiciousTerms.some((term) =>
+          transaction.description.toLowerCase().includes(term)
+        );
+
+        if (containsSuspiciousTerm) {
+          riskScore += 15;
+          flags.push("suspicious_keywords");
+          evidence.push(`Description contains potentially suspicious keywords`);
+        }
+      }
+
+      // Adjust final score and ensure it doesn't exceed 100
+      riskScore = Math.min(Math.round(riskScore), 100);
+
+      // Add normal flag if no risks were identified
+      if (flags.length === 0) {
+        flags.push("normal");
+        evidence.push("No risk factors identified");
+      }
+
+      return {
+        ...transaction,
+        riskScore,
+        flags,
+        evidence,
+        // Add risk category for easier filtering
+        riskCategory:
+          riskScore >= 70 ? "high" : riskScore >= 30 ? "medium" : "low",
+      };
     });
   };
 
@@ -126,7 +456,9 @@ const AdvancedFraudDetection = () => {
   const updateTransactionStats = (transactions) => {
     const totalTransactions = transactions.length;
     const highRiskCount = transactions.filter((t) => t.riskScore >= 70).length;
-    const mediumRiskCount = transactions.filter((t) => t.riskScore >= 30 && t.riskScore < 70).length;
+    const mediumRiskCount = transactions.filter(
+      (t) => t.riskScore >= 30 && t.riskScore < 70
+    ).length;
     const lowRiskCount = transactions.filter((t) => t.riskScore < 30).length;
 
     setTransactionStats({
@@ -134,9 +466,15 @@ const AdvancedFraudDetection = () => {
       highRiskCount,
       mediumRiskCount,
       lowRiskCount,
-      highRiskPercentage: totalTransactions ? ((highRiskCount / totalTransactions) * 100).toFixed(1) : "0.0",
-      mediumRiskPercentage: totalTransactions ? ((mediumRiskCount / totalTransactions) * 100).toFixed(1) : "0.0",
-      lowRiskPercentage: totalTransactions ? ((lowRiskCount / totalTransactions) * 100).toFixed(1) : "0.0",
+      highRiskPercentage: totalTransactions
+        ? ((highRiskCount / totalTransactions) * 100).toFixed(1)
+        : "0.0",
+      mediumRiskPercentage: totalTransactions
+        ? ((mediumRiskCount / totalTransactions) * 100).toFixed(1)
+        : "0.0",
+      lowRiskPercentage: totalTransactions
+        ? ((lowRiskCount / totalTransactions) * 100).toFixed(1)
+        : "0.0",
     });
   };
 
@@ -146,20 +484,6 @@ const AdvancedFraudDetection = () => {
     fetchUserData();
   };
 
-
-  // Add error handling with fallback to cached data
-  useEffect(() => {
-    if (error) {
-      const cachedTransactions = localStorage.getItem("cachedTransactions");
-      if (cachedTransactions) {
-        console.log("Using cached transaction data due to fetch error");
-        setTransactions(JSON.parse(cachedTransactions));
-        setIsUsingCachedData(true);
-      }
-    }
-  }, [error]);
-  
-  // Cache successful transaction fetches
   useEffect(() => {
     if (transactions.length > 0 && !isUsingCachedData) {
       localStorage.setItem("cachedTransactions", JSON.stringify(transactions));
@@ -216,7 +540,8 @@ const AdvancedFraudDetection = () => {
         Transaction Fraud Risk Analysis
       </h1>
       <h2 className="text-lg text-gray-400 mb-6">
-        Account: {userData ? userData.accountNumber : "Loading..."} | {userData ? userData.fullName : "Loading..."}
+        Account: {userData ? userData.accountNumber : "Loading..."} |{" "}
+        {userData ? userData.fullName : "Loading..."}
       </h2>
 
       {/* Error and Loading States */}
@@ -345,28 +670,42 @@ const AdvancedFraudDetection = () => {
 
       {/* Risk Score Timeline */}
       <div className="mb-6 p-4 bg-gray-800 rounded border border-gray-700">
-  <h2 className="text-lg font-semibold mb-3 text-blue-300">Risk Score Timeline</h2>
-  {filteredTransactions.length > 0 ? (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={filteredTransactions}>
-        <XAxis dataKey="timestamp" tickFormatter={(tick) => new Date(tick).toLocaleDateString()} stroke="#9ca3af" />
-        <YAxis stroke="#9ca3af" />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip contentStyle={{ backgroundColor: "#1f2937", borderColor: "#6b7280", color: "#f9fafb" }} />
-        <Line
-          type="monotone"
-          dataKey="riskScore"
-          stroke="#3b82f6"
-          strokeWidth={3}
-          dot={{ fill: "#3b82f6", r: 5 }}
-          activeDot={{ r: 8 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  ) : (
-    <div className="text-gray-400 text-center py-4">No transactions match the current filters</div>
-  )}
-</div>
+        <h2 className="text-lg font-semibold mb-3 text-blue-300">
+          Risk Score Timeline
+        </h2>
+        {filteredTransactions.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={filteredTransactions}>
+              <XAxis
+                dataKey="timestamp"
+                tickFormatter={(tick) => new Date(tick).toLocaleDateString()}
+                stroke="#9ca3af"
+              />
+              <YAxis stroke="#9ca3af" />
+              <CartesianGrid strokeDasharray="3 3" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1f2937",
+                  borderColor: "#6b7280",
+                  color: "#f9fafb",
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="riskScore"
+                stroke="#3b82f6"
+                strokeWidth={3}
+                dot={{ fill: "#3b82f6", r: 5 }}
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="text-gray-400 text-center py-4">
+            No transactions match the current filters
+          </div>
+        )}
+      </div>
 
       {/* Transaction Table */}
       <div className="mb-6">
@@ -536,7 +875,7 @@ const AdvancedFraudDetection = () => {
               <div>
                 <p className="text-sm text-gray-400">Location</p>
                 <p className="text-gray-100">
-                  {selectedTransaction.location || "N/A"}
+                  {formatLocation(selectedTransaction.location)}
                 </p>
               </div>
               <div>
