@@ -21,7 +21,7 @@ const Transaction = () => {
 
         const userData = await response.json();
         console.log("Fetched Transactions:", userData.transactions);
-        
+        localStorage.setItem('alert', "Here, you can view your account summary, add funds to your savings, and track recent transactions. You can also see the total number of transactions and categorize them as debit or credit and also analyisis the amount as well");
         setTransactions(userData.transactions || []);
         setIsLoading(false);
       } catch (err) {

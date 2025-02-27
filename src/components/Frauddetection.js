@@ -79,6 +79,7 @@ const AdvancedFraudDetection = () => {
 
       if (data && data.accountNumber) {
         setUserData(data);
+        localStorage.setItem("alert", "Here, you can check for any fraudulent activities related to transactions in your account.");
       } else {
         throw new Error("Invalid user data received from API.");
       }

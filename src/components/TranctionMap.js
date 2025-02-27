@@ -43,7 +43,7 @@ const TransactionMap = () => {
 
         const userData = await response.json();
         console.log("Fetched Transactions:", userData.transactions);
-        
+        localStorage.setItem('alert', "Here you can view all your transactions on a map and see detailed information by clicking on the markers.");
         // Filter only transactions with location data
         const transactionsWithLocation = userData.transactions?.filter(
           transaction => transaction.location && transaction.location.latitude && transaction.location.longitude

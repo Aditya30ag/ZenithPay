@@ -29,6 +29,7 @@ export default function Dashboard() {
 
       const data = await response.json();
       console.log("User data fetched successfully:", data);
+     
       setaccountNumber(data.accountNumber);
       setUserData(data);
     } catch (err) {

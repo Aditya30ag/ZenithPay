@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { SparklesCore } from "./ui/sparkles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const SignupForm = () => {
     const [formData, setFormData] = useState({
@@ -37,8 +38,10 @@ const SignupForm = () => {
         phone: `+91${formData.phonenumber}`,
       });
       setOtpSent(true);
+      localStorage.setItem("alert", "OTP sent successfully. Please check your phone.");
     } catch (error) {
       console.error("OTP Send Error:", error);
+      localStorage.setItem("alert", "Failed to send OTP. Try again.");
       setError("Failed to send OTP. Try again.");
     }
     setLoading(false);
@@ -67,7 +70,7 @@ const SignupForm = () => {
         navigate("/home");
     } catch (err) {
         console.error("Signup Error:", err);
-
+        localStorage.setItem("alert", "Failed to register. Please try again.");
         if (err.response) {
             console.log("Error Data:", err.response.data);
             console.log("Error Status:", err.response.status);
@@ -147,6 +150,17 @@ const SignupForm = () => {
           </button>
         </form>
         {error && <p className="text-red-500 text-center">{error}</p>}
+        <div className="text-center mt-4">
+          <Link
+            to="/login"
+            className="text-blue-500 hover:text-blue-700 font-semibold text-lg transition duration-300 ease-in-out"
+          >
+            <div className="py-2 px-4 rounded-md bg-gray-800 hover:bg-gray-900 text-white shadow-md inline-block">
+              Already have an account?{" "}
+              <span className="text-blue-400">Sign In</span>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );

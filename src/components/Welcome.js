@@ -31,7 +31,7 @@ export default function BankWelcomePage() {
       
         <SignedOut>
         <SignInButton mode="modal">
-          <button className="transition p-4 rounded-lg text-lg font-semibold z-10 animate-bounce">
+          <button className="transition p-4 rounded-lg text-lg font-semibold z-10 animate-bounce" onClick={() =>localStorage.setItem("alert", "You have successfully signed up for Zenith Pay. Now, please connect your Zenith account to proceed.")}>
             <img
               src="/img1.jpg"
               alt="Bank"

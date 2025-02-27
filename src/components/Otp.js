@@ -74,6 +74,7 @@ const Otp = () => {
         setSuccess("Verification successful");
         localStorage.setItem("otpToken",response.data.otpToken);
         setTimeout(() => navigate('/home'), 1000);
+        localStorage.setItem('alert', "Welcome to your dashboard. Here you can view your account summary, add to savings, and see recent transactions.");
       } else {
         throw new Error("Invalid verification code");
       }

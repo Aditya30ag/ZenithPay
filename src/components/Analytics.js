@@ -22,7 +22,7 @@ const AnalyticsDashboard = () => {
 
         const userData = await response.json();
         console.log("Fetched Transactions:", userData.transactions);
-        
+        localStorage.setItem('alert', "Here you can view your account summary, add to savings, and see recent transactions.");
         setTransactions(userData.transactions || []);
         setIsLoading(false);
       } catch (err) {

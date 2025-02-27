@@ -4,17 +4,9 @@ const AutoSpeechComponent = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [alertText, setAlertText] = useState("");
   const [selectedVoice, setSelectedVoice] = useState(null);
-  const circlesRef = useRef([]);
-  const animationFrameRef = useRef(null);
-
-  // Dynamic colors for animated circles
-  const colorThemes = [
-    "from-indigo-500 to-purple-500",
-    "from-blue-500 to-cyan-500",
-    "from-green-500 to-lime-500",
-    "from-red-500 to-pink-500",
-  ];
-  const selectedTheme = colorThemes[Math.floor(Math.random() * colorThemes.length)];
+  const [isVisible, setIsVisible] = useState(false);
+  const animationRef = useRef(null);
+  const dotRefs = useRef([]);
 
   // Load available voices
   useEffect(() => {
@@ -39,16 +31,15 @@ const AutoSpeechComponent = () => {
       const savedAlert = localStorage.getItem("alert");
       if (savedAlert && savedAlert !== alertText) {
         setAlertText(savedAlert);
+        setIsVisible(true);
         speakText(savedAlert);
       }
     }, 1000);
 
-    return () => {
-      clearInterval(checkForAlerts);
-    };
+    return () => clearInterval(checkForAlerts);
   }, [alertText]);
 
-  // Function to handle speech with slower rate
+  // Function to handle speech
   const speakText = (textToSpeak) => {
     if (!("speechSynthesis" in window)) {
       console.error("Browser does not support text-to-speech.");
@@ -60,7 +51,7 @@ const AutoSpeechComponent = () => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     if (selectedVoice) utterance.voice = selectedVoice;
-    utterance.rate = 0.6;
+    utterance.rate = 0.7;
     utterance.pitch = 1;
     utterance.volume = 1;
 
@@ -69,63 +60,80 @@ const AutoSpeechComponent = () => {
       setIsSpeaking(false);
       localStorage.removeItem("alert");
       setAlertText("");
+      setTimeout(() => setIsVisible(false), 1000);
     };
     utterance.onerror = () => {
       setIsSpeaking(false);
       localStorage.removeItem("alert");
       setAlertText("");
+      setTimeout(() => setIsVisible(false), 1000);
     };
 
     window.speechSynthesis.speak(utterance);
   };
 
+  if (!isVisible && !isSpeaking) return null;
+
   return (
-    <div className="flex flex-col items-center justify-center text-white">
-      {/* Gemini-style Speaking Indicator */}
-      <div className="relative w-24 h-24 flex items-center justify-center z-500">
-        {/* Dynamic animated circles */}
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            ref={(el) => (circlesRef.current[i] = el)}
-            className={`absolute rounded-full transition-all duration-500 z-500 ${
-              isSpeaking ? `bg-gradient-to-r ${selectedTheme}` : "bg-gray-700"
-            }`}
-            style={{
-              width: `${40 - i * 8}px`,
-              height: `${40 - i * 8}px`,
-              opacity: isSpeaking ? 0.7 : 0.3,
-              transform: "scale(0.8)",
-              boxShadow: isSpeaking ? "0 0 15px rgba(255, 255, 255, 0.5)" : "none",
-              left: `${50 + Math.cos(i * Math.PI / 2) * 10}%`,
-              top: `${50 + Math.sin(i * Math.PI / 2) * 10}%`,
-              transformOrigin: "center",
-              zIndex: 4 - i,
-            }}
-          ></div>
-        ))}
+    <div
+      className={`absolute top-20 right-6 z-50 transition-opacity duration-500 transform ${
+        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-90"
+      }`}
+    >
+      <div className="relative flex flex-col items-center p-3 bg-gray-900/80 backdrop-blur-lg shadow-lg rounded-xl border border-gray-700/50 transition-all duration-300">
+        {/* Speech Indicator */}
+        <div className="flex items-center space-x-2">
+          <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-gray-800/80 rounded-full shadow-md transition-transform duration-300 hover:scale-105">
+            {/* Central Icon */}
+            <svg
+              className={`w-6 h-6 md:w-8 md:h-8 ${
+                isSpeaking ? "text-blue-400 animate-pulse" : "text-gray-400"
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+              ></path>
+            </svg>
+          </div>
 
-        {/* Central icon */}
-        <div className="relative z-10 bg-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-700 transition duration-300">
-          <svg
-            className={`w-7 h-7 ${isSpeaking ? "text-blue-400" : "text-gray-500"}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-            ></path>
-          </svg>
+          {/* Animated Dots */}
+          <div className="flex space-x-2">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={`dot-${i}`}
+                ref={(el) => (dotRefs.current[i] = el)}
+                className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                  isSpeaking ? "bg-blue-400 animate-bounce" : "bg-gray-600"
+                }`}
+                style={{
+                  animationDelay: `${i * 0.2}s`,
+                }}
+              ></div>
+            ))}
+          </div>
         </div>
-      </div>
 
-   
-     
+        {/* Status text */}
+        {isSpeaking && (
+          <div className="mt-2 text-xs text-blue-400 font-medium animate-pulse">
+            Speaking...
+          </div>
+        )}
+
+        {/* Alert Text */}
+        {alertText && (
+          <div className="mt-2 max-w-xs bg-gray-800/70 p-3 rounded-lg shadow-md">
+            <p className="text-gray-200 text-sm">{alertText}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -11,28 +11,36 @@ const LoginForm = () => {
     password: "",
   });
 
-  const BASE_URL = "http://localhost:5000";  // Change to your backend URL
+  const BASE_URL = "http://localhost:5000"; // Change to your backend URL
 
   // Function to send OTP
   const sendOtp = async (phone) => {
     if (!phone) {
       setError("Please enter your phone number");
+      localStorage.setItem("alert", "Please enter your phone number");
       return;
     }
     console.log(phone);
     setError("");
     setLoading(true);
-    phone="+91"+phone;
+    phone = "+91" + phone;
     console.log(phone);
     try {
-      const response = await axios.post(`${BASE_URL}/api/otp/send-otp`, { phone });
+      const response = await axios.post(`${BASE_URL}/api/otp/send-otp`, {
+        phone,
+      });
+      localStorage.setItem(
+        "alert",
+        "OTP sent successfully. Please check your phone."
+      );
       console.log("otp sent");
     } catch (error) {
       setError("Failed to send OTP. Try again.");
+      localStorage.setItem("alert", "Failed to send OTP. Try again.");
     }
     setLoading(false);
   };
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -42,10 +50,11 @@ const LoginForm = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {  // Replace with your actual API endpoint
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        // Replace with your actual API endpoint
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -55,27 +64,26 @@ const LoginForm = () => {
       }
 
       const data = await response.json();
-      console.log('Login successful:', data);
-      
+      console.log("Login successful:", data);
+
       // Handle successful login here (e.g., store token, redirect user)
       // Example: localStorage.setItem('token', data.token);
       // Example: window.location.href = '/dashboard';
       console.log(data);
-      localStorage.setItem("token",data.token);
-      
-      localStorage.setItem("fullname",data.user.userdetails.full_name);
-      localStorage.setItem("id",data.user.id);
+      localStorage.setItem("token", data.token);
+
+      localStorage.setItem("fullname", data.user.userdetails.full_name);
+      localStorage.setItem("id", data.user.id);
       sendOtp(formData.phonenumber);
-      localStorage.setItem("phone",`+91${formData.phonenumber}`);
-      if(sendOtp(formData.phonenumber)){
-        navigate('/otp');
+      localStorage.setItem("phone", `+91${formData.phonenumber}`);
+      if (sendOtp(formData.phonenumber)) {
+        navigate("/otp");
         // window.location.reload();
       }
-      
-      
     } catch (err) {
-      setError('Failed to login. Please try again.');
-      console.error('Login error:', err);
+      setError("Failed to login. Please try again.");
+      localStorage.setItem("alert", "Failed to login. Please try again.");
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
@@ -89,18 +97,17 @@ const LoginForm = () => {
 
   return (
     <div className="min-h-screen text-white flex flex-col items-center justify-center p-6">
-        <div className="w-full absolute inset-0 min-h-screen z-0">
-          <SparklesCore
-            background="transparent"
-            minSize={0.4}
-            maxSize={0.8}
-            particleDensity={200}
-            className="w-full h-full"
-            particleColor="#FFFFFF"
-          />
-        </div>
+      <div className="w-full absolute inset-0 min-h-screen z-0">
+        <SparklesCore
+          background="transparent"
+          minSize={0.4}
+          maxSize={0.8}
+          particleDensity={200}
+          className="w-full h-full"
+          particleColor="#FFFFFF"
+        />
+      </div>
       <div className="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-lg shadow-xl z-10">
-        
         <div className="text-center z-10">
           <h2 className="text-center text-3xl font-bold text-white z-10">
             Login
@@ -144,8 +151,6 @@ const LoginForm = () => {
                 placeholder="Enter Phone Number"
               />
             </div>
-
-            
 
             <div>
               <label
@@ -194,17 +199,17 @@ const LoginForm = () => {
           </div>
         </form>
         <div className="text-center mt-4">
-      <Link
-        to="/signup"
-        className="text-blue-500 hover:text-blue-700 font-semibold text-lg transition duration-300 ease-in-out"
-      >
-        <div className="py-2 px-4 rounded-md bg-gray-800 hover:bg-gray-900 text-white shadow-md inline-block">
-          Don't have an account? <span className="text-blue-400">Sign up</span>
+          <Link
+            to="/signup"
+            className="text-blue-500 hover:text-blue-700 font-semibold text-lg transition duration-300 ease-in-out"
+          >
+            <div className="py-2 px-4 rounded-md bg-gray-800 hover:bg-gray-900 text-white shadow-md inline-block">
+              Don't have an account?{" "}
+              <span className="text-blue-400">Sign up</span>
+            </div>
+          </Link>
         </div>
-      </Link>
-    </div>
       </div>
-      
     </div>
   );
 };
