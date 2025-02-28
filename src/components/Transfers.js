@@ -182,7 +182,7 @@ export default function Transfer() {
       try {
         const data = JSON.parse(textData); // Try parsing JSON
         console.log("Parsed JSON:", data);
-
+        localStorage.setItem("alert", "Transfer successful!");
         if (!response.ok) {
           throw new Error(data.message || "Transfer failed. Please try again.");
         }

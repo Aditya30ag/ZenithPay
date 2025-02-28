@@ -83,9 +83,10 @@ export default function Dashboard() {
         balance: newBalance,
         savingAmount: newSavings,
       }));
-
+      console.log("Savings updated successfully:");
       setSavingAmount(""); // Reset input field
       alert("Savings updated successfully!");
+      localStorage.setItem("alert","Savings updated successfully!");
     } catch (err) {
       console.error("Error updating savings:", err);
       alert(err.message);

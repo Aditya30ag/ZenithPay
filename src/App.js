@@ -9,6 +9,9 @@ import ZenithDashboard from './components/Home';
 import SignupForm from './components/Signupform';
 import { ClerkProvider } from "@clerk/clerk-react";
 import Navbar from './components/Navbar';
+import CookieBanner from './components/CookiePolicy';
+import PrivacyPolicy from './components/Privacypolicy';
+import Logo from './components/Logo';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredAuth, redirectPath }) => {
@@ -58,13 +61,13 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" frontendApi={clerkFrontendApi}><BankWelcomePage /></ClerkProvider>
+      element: <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" frontendApi={clerkFrontendApi}><BankWelcomePage /><Logo/><CookieBanner/></ClerkProvider>
     },
     {
       path: "/login",
       element: (
         <AuthRedirect authType="token" redirectTo="/otp">
-          <Navbar />
+          <Navbar /><CookieBanner/><Logo/>
           <LoginForm />
         </AuthRedirect>
       )
@@ -74,7 +77,7 @@ function App() {
       element: (
         <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" frontendApi={clerkFrontendApi}>
         <AuthRedirect authType="token" redirectTo="/otp">
-          <SignupForm/>
+          <SignupForm/><Logo/><CookieBanner/>
         </AuthRedirect></ClerkProvider>
       )
     },
@@ -84,7 +87,7 @@ function App() {
         <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/" frontendApi={clerkFrontendApi}>
         <AuthRedirect authType="otpToken" redirectTo="/home">
           <ProtectedRoute requiredAuth="token" redirectPath="/login">
-            <Otp />
+            <Otp /><Logo/><CookieBanner/>
           </ProtectedRoute>
         </AuthRedirect></ClerkProvider>
       )
@@ -94,8 +97,16 @@ function App() {
       element: (
         
         <ProtectedRoute requiredAuth="otpToken" redirectPath="/otp">
-          <ZenithDashboard />
+          <ZenithDashboard /><CookieBanner/>
         </ProtectedRoute>
+      )
+    },
+    {
+      path: "/privacypolicy",
+      element: (
+        <>
+        <Logo/>
+        <PrivacyPolicy/></>
       )
     }
   ]);

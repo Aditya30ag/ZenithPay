@@ -5,7 +5,8 @@ import {
   CreditCard,
   PieChart,
   Send,
-  History
+  History,
+  MapIcon
 } from "lucide-react";
 import Dashborad from "./Dashborad";
 // import TidioChat from "./TidioChat";
@@ -59,7 +60,7 @@ const ZenithDashboard = () => {
     { name: "Transactions", icon: History},
     { name: "Analytics", icon: PieChart},
     { name: "Frauddetection", icon: PieChart},
-    { name: "TransactionMap", icon: PieChart},
+    { name: "TransactionMap", icon: MapIcon},
   ];
 
   const renderDashboard = () => {
@@ -116,19 +117,20 @@ const ZenithDashboard = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 mt-4 space-y-2 overflow-y-auto scrollbar-hide">
-          {navigation.map((item) => (
-            <button
-              onClick={handleonclick}
-              name={item.name}
-              key={item.name}
-              className="group flex items-center px-4 py-3 text-slate-300 rounded-xl hover:bg-slate-800/50 transition-all duration-300 w-full text-left"
-            >
-              <item.icon className="w-5 h-5 mr-3 text-slate-400 group-hover:text-blue-400" />
-              {item.name}
-            </button>
-          ))}
-        </nav>
+        <nav className="flex-1 px-4 mt-4 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-slate-800">
+  {navigation.map((item) => (
+    <button
+      onClick={handleonclick}
+      name={item.name}
+      key={item.name}
+      className="group flex items-center px-4 py-3 text-slate-300 rounded-xl hover:bg-slate-800/50 transition-all duration-300 w-full text-left"
+    >
+      <item.icon className="w-5 h-5 mr-3 text-slate-400 group-hover:text-blue-400" />
+      {item.name}
+    </button>
+  ))}
+</nav>
+
         <AttentionHeatmap/>
         {/* Profile Section */}
         <div className="p-4 border-t border-slate-800">
