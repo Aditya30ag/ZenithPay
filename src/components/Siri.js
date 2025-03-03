@@ -8,6 +8,7 @@ const useVoiceAssistant = ({ sendDataToParent }) => {
   const recognitionRef = useRef(null);
   const timeoutRef = useRef(null);
   const isRecognitionActiveRef = useRef(false);
+  const cooldownRef = useRef(false); // Added cooldown ref to prevent double activation
 
   // Function to handle the "dashboard" command separately
   const handleDashboardCommand = () => {
@@ -28,6 +29,26 @@ const useVoiceAssistant = ({ sendDataToParent }) => {
     console.log("Frauddetection COMMAND DETECTED!");
     speak("Frauddetection opened.");
     sendDataToParent("Frauddetection");
+    console.log("Data sent to parent.");
+  };
+
+  const handleanalyticsCommand = () => {
+    console.log("Analytics COMMAND DETECTED!");
+    speak("Analytics opened.");
+    sendDataToParent("Analytics");
+    console.log("Data sent to parent.");
+  };
+
+  const handleaccountCommand = () => {
+    console.log("Account COMMAND DETECTED!");
+    speak("Account opened.");
+    sendDataToParent("Accounts");
+    console.log("Data sent to parent.");
+  };
+  const handletransactionCommand = () => {
+    console.log("Transactions COMMAND DETECTED!");
+    speak("Transactions opened.");
+    sendDataToParent("Transactions");
     console.log("Data sent to parent.");
   };
 
@@ -77,26 +98,90 @@ const useVoiceAssistant = ({ sendDataToParent }) => {
         const transcript = latestResult[0].transcript.toLowerCase().trim();
         console.log("Transcript:", transcript);
         
-        // Check for direct commands with "hey siri" prefix
-        if (transcript.includes("hey siri") && transcript.includes("dashboard")) {
+        // Check for direct commands with "jarvis" prefix - with cooldown check
+        if (transcript.includes("jarvis") && transcript.includes("dashboard") && !cooldownRef.current) {
+          cooldownRef.current = true;
           handleDashboardCommand();
+          
+          // Reset cooldown after 2 seconds
+          setTimeout(() => {
+            cooldownRef.current = false;
+          }, 2000);
+          
           return;
         }
         
-        if (transcript.includes("hey siri") && transcript.includes("map")) {
+        if (transcript.includes("jarvis") && transcript.includes("map") && !cooldownRef.current) {
+          cooldownRef.current = true;
           handleTransactionMapCommand();
+          
+          // Reset cooldown after 2 seconds
+          setTimeout(() => {
+            cooldownRef.current = false;
+          }, 2000);
+          
           return;
         }
         
-        if (transcript.includes("hey siri") && (transcript.includes("frauddetails") || 
-            transcript.includes("fraud details") || transcript.includes("fraud"))) {
+        if (transcript.includes("jarvis") && (transcript.includes("frauddetails") || 
+            transcript.includes("fraud details") || transcript.includes("fraud")) && !cooldownRef.current) {
+          cooldownRef.current = true;
           handleFrauddetectionCommand();
+          
+          // Reset cooldown after 2 seconds
+          setTimeout(() => {
+            cooldownRef.current = false;
+          }, 2000);
+          
           return;
         }
 
-        // Activate assistant if "hey siri" is detected
-        if (!isActivated && transcript.includes("hey siri")) {
+        if (transcript.includes("jarvis") && (transcript.includes("analytics") || 
+            transcript.includes("analytics") || transcript.includes("analytics")) && !cooldownRef.current) {
+          cooldownRef.current = true;
+          handleanalyticsCommand();
+          
+          // Reset cooldown after 2 seconds
+          setTimeout(() => {
+            cooldownRef.current = false;
+          }, 2000);
+          
+          return;
+        }
+        if (transcript.includes("jarvis") && (transcript.includes("account") || 
+            transcript.includes("account") || transcript.includes("account")) && !cooldownRef.current) {
+          cooldownRef.current = true;
+          handleaccountCommand();
+          
+          // Reset cooldown after 2 seconds
+          setTimeout(() => {
+            cooldownRef.current = false;
+          }, 2000);
+          
+          return;
+        }
+        if (transcript.includes("jarvis") && (transcript.includes("transaction") || 
+            transcript.includes("transaction") || transcript.includes("transaction")) && !cooldownRef.current) {
+          cooldownRef.current = true;
+          handletransactionCommand();
+          
+          // Reset cooldown after 2 seconds
+          setTimeout(() => {
+            cooldownRef.current = false;
+          }, 2000);
+          
+          return;
+        }
+        // Activate assistant if "jarvis" is detected - with cooldown check
+        if (!isActivated && transcript.includes("jarvis") && !cooldownRef.current) {
+          cooldownRef.current = true;
           activateAssistant();
+          
+          // Reset cooldown after 2 seconds
+          setTimeout(() => {
+            cooldownRef.current = false;
+          }, 2000);
+          
           return;
         }
 
@@ -157,12 +242,12 @@ const useVoiceAssistant = ({ sendDataToParent }) => {
 
   const activateAssistant = () => {
     if (isActivated) return; // Prevent duplicate activation
-    console.log("Assistant activated! ('Hey Siri' detected)");
+    console.log("Assistant activated! ('jarvis' detected)");
     setIsActivated(true);
     setAnimation(true);
 
     playActivationSound();
-    speak("Yes, how can I help you?");
+    speak("Yes Boss, how can I help you?");
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
