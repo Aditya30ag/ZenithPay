@@ -18,6 +18,7 @@ import Navbar from "./Navbar";
 import FraudDetectionDashboard from "./Frauddetection";
 import AttentionHeatmap from "./HeatMap";
 import TransactionMap from "./TranctionMap";
+import VoiceAssistant from "./SpeechRecognition";
 
 const ZenithDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -88,7 +89,9 @@ const ZenithDashboard = () => {
   const handleonclick = (e) => {
     setActiveSection(e.target.name);
   };
-
+  const handleDataFromChild = (childData) => {
+    setActiveSection(childData);
+  };
   return (
     <div className="min-h-screen text-slate-50 relative overflow-hidden">
       {/* Gooey Background */}
@@ -189,6 +192,8 @@ const ZenithDashboard = () => {
             {activeSection === "TransactionMap" && renderTransactionMap()}
           </div>
         </main>
+        <div className="p-6 space-y-6 relative">
+        <VoiceAssistant sendDataToParent={handleDataFromChild}/></div>
       </div>
     </div>
   );

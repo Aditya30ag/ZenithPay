@@ -8,13 +8,29 @@ const AutoSpeechComponent = () => {
   const animationRef = useRef(null);
   const dotRefs = useRef([]);
 
-  // Load available voices
+  // Load available female voices
   useEffect(() => {
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
-        const englishVoice = voices.find((voice) => voice.lang.includes("en-"));
-        setSelectedVoice(englishVoice || voices[0]);
+        // First try to find a female English voice
+        const femaleEnglishVoice = voices.find(
+          (voice) => voice.lang.includes("en-") && voice.name.toLowerCase().includes("female")
+        );
+        
+        // If no voice with "female" in the name, try common female voice names
+        const commonFemaleVoices = voices.filter(
+          (voice) => 
+            voice.name.toLowerCase().includes("samantha")
+        );
+        
+        // Set voice preference in this order: explicit female, common female name, or any English
+        setSelectedVoice(
+          femaleEnglishVoice || 
+          (commonFemaleVoices.length > 0 ? commonFemaleVoices[0] : null) || 
+          voices.find((voice) => voice.lang.includes("en-")) || 
+          voices[0]
+        );
       }
     };
 
@@ -50,9 +66,18 @@ const AutoSpeechComponent = () => {
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    if (selectedVoice) utterance.voice = selectedVoice;
+    
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+      // Make voice more feminine with slightly higher pitch if it's not explicitly female
+      if (!selectedVoice.name.toLowerCase().includes("female")) {
+        utterance.pitch = 1.2; // Slightly higher pitch for more feminine sound
+      } else {
+        utterance.pitch = 1;
+      }
+    }
+    
     utterance.rate = 0.7;
-    utterance.pitch = 1;
     utterance.volume = 1;
 
     utterance.onstart = () => setIsSpeaking(true);
@@ -84,7 +109,7 @@ const AutoSpeechComponent = () => {
         {/* Speech Indicator */}
         <div className="flex items-center space-x-2">
           <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-gray-800/80 rounded-full shadow-md transition-transform duration-300 hover:scale-105">
-            {/* Central Icon */}
+            {/* Female Voice Icon */}
             <svg
               className={`w-6 h-6 md:w-8 md:h-8 ${
                 isSpeaking ? "text-blue-400 animate-pulse" : "text-gray-400"
@@ -119,6 +144,13 @@ const AutoSpeechComponent = () => {
             ))}
           </div>
         </div>
+
+        {/* Voice indicator */}
+        {selectedVoice && (
+          <div className="mt-1 text-xs text-gray-400">
+            {selectedVoice.name}
+          </div>
+        )}
 
         {/* Status text */}
         {isSpeaking && (

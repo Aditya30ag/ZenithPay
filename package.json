@@ -9,6 +9,7 @@
     "@mediapipe/tasks-vision": "^0.10.21",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
+    "annyang": "^2.6.1",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "cra-template": "1.2.0",
