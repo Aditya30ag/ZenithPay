@@ -182,7 +182,6 @@ export default function Transfer() {
       try {
         const data = JSON.parse(textData); // Try parsing JSON
         console.log("Parsed JSON:", data);
-        localStorage.setItem("alert", "Transfer successful!");
         if (!response.ok) {
           throw new Error(data.message || "Transfer failed. Please try again.");
         }
@@ -195,8 +194,10 @@ export default function Transfer() {
           merchant: formData.merchant,
           location: locationData,
         });
+        localStorage.setItem("alert", "Transfer successful!");
       } catch (err) {
         console.error("JSON Parsing Error:", err);
+        localStorage.setItem("alert", "Transfer failed. Please try again.");
         setError("Invalid server response. Please try again later.");
       }
     } catch (networkErr) {

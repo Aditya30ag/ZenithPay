@@ -19,6 +19,7 @@ import FraudDetectionDashboard from "./Frauddetection";
 import AttentionHeatmap from "./HeatMap";
 import TransactionMap from "./TranctionMap";
 import VoiceAssistant from "./SpeechRecognition";
+import StockRecommendations from "./StockRecommendations";
 
 const ZenithDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,6 +63,7 @@ const ZenithDashboard = () => {
     { name: "Analytics", icon: PieChart},
     { name: "Frauddetection", icon: PieChart},
     { name: "TransactionMap", icon: MapIcon},
+    { name: "StockRecommendations", icon: MapIcon},
   ];
 
   const renderDashboard = () => {
@@ -84,6 +86,9 @@ const ZenithDashboard = () => {
   };
   const renderTransactionMap = () => {
     return <TransactionMap/>
+  };
+  const renderStockRecommendations = () => {
+    return <StockRecommendations/>
   };
 
   const handleonclick = (e) => {
@@ -190,6 +195,7 @@ const ZenithDashboard = () => {
             {activeSection === "Transfers" && renderTransfers()}
             {activeSection === "Frauddetection" && renderFraudDetection()}
             {activeSection === "TransactionMap" && renderTransactionMap()}
+            {activeSection === "StockRecommendations" && renderStockRecommendations()}
           </div>
         </main>
         <div className="p-6 space-y-6 relative">

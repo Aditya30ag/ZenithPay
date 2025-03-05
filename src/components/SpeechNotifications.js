@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { X } from 'lucide-react'; // Using Lucide for a clean cross icon
 
 const AutoSpeechComponent = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -96,7 +97,14 @@ const AutoSpeechComponent = () => {
 
     window.speechSynthesis.speak(utterance);
   };
-
+  
+    // Function to manually dismiss the alert
+    const dismissAlert = () => {
+      localStorage.removeItem("alert");
+      setAlertText("");
+      setIsVisible(false);
+      window.speechSynthesis.cancel();
+    };
   if (!isVisible && !isSpeaking) return null;
 
   return (
@@ -106,7 +114,18 @@ const AutoSpeechComponent = () => {
       }`}
     >
       <div className="relative flex flex-col items-center p-3 bg-gray-900/80 backdrop-blur-lg shadow-lg rounded-xl border border-gray-700/50 transition-all duration-300">
-        {/* Speech Indicator */}
+        {/* Close Button */}
+        {alertText && (
+          <button 
+            onClick={dismissAlert}
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-200 transition-colors"
+            aria-label="Dismiss Alert"
+          >
+            <X size={16} />
+          </button>
+        )}
+
+        {/* Rest of the existing component remains the same */}
         <div className="flex items-center space-x-2">
           <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-gray-800/80 rounded-full shadow-md transition-transform duration-300 hover:scale-105">
             {/* Female Voice Icon */}

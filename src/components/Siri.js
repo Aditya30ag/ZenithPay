@@ -13,41 +13,41 @@ const useVoiceAssistant = ({ sendDataToParent }) => {
   // Function to handle the "dashboard" command separately
   const handleDashboardCommand = () => {
     console.log("DASHBOARD COMMAND DETECTED!");
-    speak("Dashboard opened.");
+   
     sendDataToParent("Dashboard");
     console.log("Data sent to parent.");
   };
   
   const handleTransactionMapCommand = () => {
     console.log("TransactionMap COMMAND DETECTED!");
-    speak("TransactionMap opened.");
+   
     sendDataToParent("TransactionMap");
     console.log("Data sent to parent.");
   };
   
   const handleFrauddetectionCommand = () => {
     console.log("Frauddetection COMMAND DETECTED!");
-    speak("Frauddetection opened.");
+    
     sendDataToParent("Frauddetection");
     console.log("Data sent to parent.");
   };
 
   const handleanalyticsCommand = () => {
     console.log("Analytics COMMAND DETECTED!");
-    speak("Analytics opened.");
+    
     sendDataToParent("Analytics");
     console.log("Data sent to parent.");
   };
 
   const handleaccountCommand = () => {
     console.log("Account COMMAND DETECTED!");
-    speak("Account opened.");
+   
     sendDataToParent("Accounts");
     console.log("Data sent to parent.");
   };
   const handletransactionCommand = () => {
     console.log("Transactions COMMAND DETECTED!");
-    speak("Transactions opened.");
+    
     sendDataToParent("Transactions");
     console.log("Data sent to parent.");
   };
@@ -255,7 +255,7 @@ const useVoiceAssistant = ({ sendDataToParent }) => {
       setIsActivated(false);
       setAnimation(false);
       // We don't turn off listening, so it can be reactivated with the wake word
-    }, 10000); // 10 seconds
+    }, 8000); // 8 seconds
   };
 
   const playActivationSound = () => {

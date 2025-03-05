@@ -74,6 +74,7 @@ const LoginForm = () => {
 
       localStorage.setItem("fullname", data.user.userdetails.full_name);
       localStorage.setItem("id", data.user.id);
+      localStorage.setItem("senderAccount", data.user.userdetails.account_number);
       sendOtp(formData.phonenumber);
       localStorage.setItem("phone", `+91${formData.phonenumber}`);
       if (sendOtp(formData.phonenumber)) {
