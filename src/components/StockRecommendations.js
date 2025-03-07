@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Search } from 'lucide-react';
+import ParticleCanvas from './ParticleCanvas';
 
 const StockRecommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
@@ -131,6 +132,7 @@ const StockRecommendations = () => {
 
   return (
     <div className="container mx-auto p-4 bg-gray-900 text-white">
+      <ParticleCanvas/>
       <h1 className="text-2xl font-bold mb-4">Stock Recommendations</h1>
 
       {/* Search Bar */}

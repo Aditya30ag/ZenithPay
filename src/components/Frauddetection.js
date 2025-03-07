@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import ParticleCanvas from "./ParticleCanvas";
 
 const AdvancedFraudDetection = () => {
   // State for user data
@@ -537,6 +538,7 @@ const AdvancedFraudDetection = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-gray-900 text-gray-100 min-h-screen">
+      <ParticleCanvas/>
       <h1 className="text-2xl font-bold mb-2 text-blue-400">
         Transaction Fraud Risk Analysis
       </h1>

@@ -103,7 +103,7 @@ const LoanCreationForm = ({ onCreateLoan }) => {
   };
 
   return (
-    <div className="w-full md:w-2/3 lg:w-1/2 px-4 mx-auto">
+    <div className="p-4 mx-auto bg-gray-900 min-w-screen rounded-xl">
       <div className="w-full bg-gray-800 shadow-2xl rounded-xl border border-gray-700 overflow-hidden">
         <div className="bg-gray-900 p-4 sm:p-6 border-b border-gray-700">
           <h3 className="text-xl sm:text-2xl font-bold text-center text-white">
@@ -123,7 +123,7 @@ const LoanCreationForm = ({ onCreateLoan }) => {
               Loan Amount
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-3 text-gray-400">$</span>
+              <span className="absolute left-3 top-3 text-gray-400">₹</span>
               <input
                 type="number"
                 inputMode="decimal"
@@ -189,11 +189,11 @@ const LoanCreationForm = ({ onCreateLoan }) => {
             <div className="bg-gray-700 p-4 rounded-md">
               <h4 className="text-white font-medium mb-2">Loan Summary</h4>
               <div className="text-gray-300 text-sm space-y-1">
-                <p>Principal: ${parseFloat(loanDetails.amount).toLocaleString()}</p>
+                <p>Principal: ₹{parseFloat(loanDetails.amount).toLocaleString()}</p>
                 <p>Interest Rate: {loanDetails.interestRate}%</p>
                 <p>Tenure: {loanDetails.tenureMonths} months</p>
                 <p className="text-white font-medium pt-2">
-                  Est. Monthly Payment: $
+                  Est. Monthly Payment: ₹
                   {(
                     (parseFloat(loanDetails.amount) * (parseFloat(loanDetails.interestRate) / 100 / 12) * 
                     Math.pow(1 + parseFloat(loanDetails.interestRate) / 100 / 12, parseInt(loanDetails.tenureMonths))) / 
