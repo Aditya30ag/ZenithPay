@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ParticleCanvas from "./ParticleCanvas";
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
@@ -121,6 +122,7 @@ export default function Dashboard() {
     : [];
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <ParticleCanvas />
       <h1 className="text-2xl font-bold mb-6">Welcome, {userData.fullName}</h1>
 
       {/* Account Summary Cards */}

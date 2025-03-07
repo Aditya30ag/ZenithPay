@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ParticleCanvas from './ParticleCanvas';
 
 export default function Account() {
   const [userData, setUserData] = useState({
@@ -68,6 +69,7 @@ export default function Account() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-900 border border-gray-800 rounded-lg shadow-lg text-gray-200">
+      <ParticleCanvas />
       <h2 className="text-2xl font-bold mb-6 text-center text-white">User Profile</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -9,7 +9,7 @@ const CookieBanner = () => {
 
     if (!cookiesAccepted) {
       const handleScroll = () => {
-        if (window.scrollY >= 10) {
+        if (window.scrollY >= 1) {
           setShowPopup(true);
         }
       };

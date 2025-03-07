@@ -6,7 +6,8 @@ import {
   PieChart,
   Send,
   History,
-  MapIcon
+  MapIcon,
+  LoaderCircleIcon
 } from "lucide-react";
 import Dashborad from "./Dashborad";
 // import TidioChat from "./TidioChat";
@@ -20,6 +21,11 @@ import AttentionHeatmap from "./HeatMap";
 import TransactionMap from "./TranctionMap";
 import VoiceAssistant from "./SpeechRecognition";
 import StockRecommendations from "./StockRecommendations";
+import LoanCreationForm from "./loans/LoanCreationForm ";
+import LoanFundingList from "./loans/LoanFundingList ";
+import LoanManagementDashboard from "./loans/LoanManagementDashboard ";
+import ParticleCanvas from "./ParticleCanvas";
+import Loanfundinglistother from "./loans/Loanfundinglistother";
 
 const ZenithDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -63,7 +69,8 @@ const ZenithDashboard = () => {
     { name: "Analytics", icon: PieChart},
     { name: "Frauddetection", icon: PieChart},
     { name: "TransactionMap", icon: MapIcon},
-    { name: "StockRecommendations", icon: MapIcon},
+    { name: "Stock", icon: PieChart},
+    { name: "LoanCreationForm", icon: LoaderCircleIcon},
   ];
 
   const renderDashboard = () => {
@@ -97,6 +104,31 @@ const ZenithDashboard = () => {
   const handleDataFromChild = (childData) => {
     setActiveSection(childData);
   };
+
+  const [loans, setLoans] = useState([]);
+  const [currentUser, setCurrentUser] = useState({
+    username: localStorage.getItem('fullname'),
+  });
+
+  const handleCreateLoan = (newLoan) => {
+    setLoans([...loans, newLoan]);
+  };
+
+  const handleFundLoan = (loanId, lenderUsername) => {
+    setLoans(loans.map(loan => 
+      loan.id === loanId ? { ...loan, lender: lenderUsername, status: 'active' } : loan
+    ));
+  };
+  const renderLoanCreationForm = () => {
+    return <div>
+      <ParticleCanvas/>
+      <LoanCreationForm onCreateLoan={handleCreateLoan}/>
+    <LoanFundingList loans={loans} currentUser={currentUser} onFundLoan={handleFundLoan} />
+    <Loanfundinglistother loans={loans} currentUser={currentUser} onFundLoan={handleFundLoan}/>
+    <LoanManagementDashboard loans={loans} currentUser={currentUser} /></div>
+
+  };
+
   return (
     <div className="min-h-screen text-slate-50 relative overflow-hidden">
       {/* Gooey Background */}
@@ -139,7 +171,7 @@ const ZenithDashboard = () => {
   ))}
 </nav>
 
-        <AttentionHeatmap/>
+        {/* <AttentionHeatmap/> */}
         {/* Profile Section */}
         <div className="p-4 border-t border-slate-800">
           <div className="relative p-4 bg-slate-900/80 backdrop-blur-sm rounded-xl flex items-center gap-3 shadow-md">
@@ -195,8 +227,10 @@ const ZenithDashboard = () => {
             {activeSection === "Transfers" && renderTransfers()}
             {activeSection === "Frauddetection" && renderFraudDetection()}
             {activeSection === "TransactionMap" && renderTransactionMap()}
-            {activeSection === "StockRecommendations" && renderStockRecommendations()}
+            {activeSection === "Stock" && renderStockRecommendations()}
+            {activeSection === "LoanCreationForm" && renderLoanCreationForm()}
           </div>
+          
         </main>
         <div className="p-6 space-y-6 relative">
         <VoiceAssistant sendDataToParent={handleDataFromChild}/></div>

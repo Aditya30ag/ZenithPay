@@ -1,3 +1,99 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Scrollbar */
+nav::-webkit-scrollbar {
+    width: 8px; /* Adjust width */
+  }
+  
+  nav::-webkit-scrollbar-thumb {
+    background-color: #3b82f6; /* Tailwind blue-500 */
+    border-radius: 4px;
+  }
+  
+  nav::-webkit-scrollbar-track {
+    background: #1e293b; /* Tailwind slate-800 */
+  }
+
+  /* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";  */
+
+:root{
+  --bg-primary: #03050e;
+  --bg-secondary:#080a14;
+  --bg-accent:#101530;
+  --bg-muted: #141414;
+  --foreground: #f7f7f8;
+  --muted-foreground: #7f8296;
+  --border-primary: #262626;
+  --border-secondary: #101530;
+  --gradient: linear-gradient(to top left,
+  #32cd32,   /* Lime */
+  #1cac78,   /* Chartreuse */
+  #4fffb0     /* Bright Green */ 
+  );
+  --primary: #8295f3;
+  --primary-accent:#758bf1;
+  --destructive: #7f1d1d;
+  --warning:#ffa500;
+  --transition:all 400ms ease;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+html,body{
+  min-height: 100vh;
+  background: #03050e;
+  color: var(--foreground);
+  font-family: "Poppins", sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+
+body {
+  overflow: hidden;
+  overflow-y: auto;
+  max-width: 1800px;
+  margin: auto;
+}
+
+
+
+
+
+
+
+.flex{
+  display: flex;
+  gap: 20px;
+}
+
+.flex-center{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+
+
+
+
+
+@media (max-width:900px){
+  .heading-1{
+    font-size: 45px;
+    line-height: 50px;
+  }
+}
+
+@media (max-width:600px){
+  .heading-1{
+    font-size: 25px;
+    line-height: 30px;
+    
+  }
+}

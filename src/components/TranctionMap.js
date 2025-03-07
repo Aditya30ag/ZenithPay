@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ParticleCanvas from './ParticleCanvas';
 
 const TransactionMap = () => {
   const [transactions, setTransactions] = useState([]);
@@ -265,6 +266,7 @@ const TransactionMap = () => {
   const renderTransactionList = () => {
     return (
       <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
+        <ParticleCanvas/>
         <h2 className="text-lg font-semibold mb-4 text-gray-300">Transaction Locations</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full bg-gray-800">
